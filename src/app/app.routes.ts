@@ -5,6 +5,12 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
+      import('./pages/pagina-inicio/pagina-inicio')
+        .then(m => m.PaginaInicio)
+  },
+  {
+    path: 'aprendizaje-gamificado',
+    loadComponent: () =>
       import('./pages/aprendizaje-gamificado/aprendizaje-gamificado')
         .then(m => m.AprendizajeGamificado)
   },
