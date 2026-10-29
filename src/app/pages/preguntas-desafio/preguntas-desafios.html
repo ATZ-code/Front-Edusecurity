@@ -1,0 +1,94 @@
+
+<div class="pagina-desafios">
+  <header class="encabezado">
+    <div class="etiqueta">EDUSECURITY · FORMACIÓN</div>
+    <h1>Preguntas y Desafíos</h1>
+    <p>
+      Pon a prueba tus conocimientos sobre ciberseguridad y aprende
+      a proteger tu información.
+    </p>
+  </header>
+
+  <section class="resumen-puntos">
+    <div>
+      <span class="texto-secundario">Puntuación acumulada</span>
+      <strong>{{ puntos }} puntos</strong>
+    </div>
+
+    <div>
+      <span class="texto-secundario">Progreso</span>
+      <strong>
+        {{ finalizado ? preguntas.length : indiceActual + 1 }}
+        / {{ preguntas.length }}
+      </strong>
+    </div>
+  </section>
+
+  <section class="tarjeta-desafio" *ngIf="!finalizado">
+    <div class="barra-progreso">
+      <div
+        class="barra-progreso-valor"
+        [style.width.%]="((indiceActual + 1) / preguntas.length) * 100">
+      </div>
+    </div>
+
+    <span class="numero-pregunta">
+      PREGUNTA {{ indiceActual + 1 }}
+    </span>
+
+    <h2>{{ preguntaActual.enunciado }}</h2>
+
+    <div class="lista-opciones">
+      <button
+        *ngFor="let opcion of preguntaActual.opciones; let i = index"
+        type="button"
+        class="opcion"
+        [class.correcta]="respondida && i === preguntaActual.respuestaCorrecta"
+        [class.incorrecta]="respondida && i === respuestaSeleccionada && i !== preguntaActual.respuestaCorrecta"
+        [disabled]="respondida"
+        (click)="responder(i)">
+
+        <span class="letra-opcion">
+          {{ ['A', 'B', 'C', 'D'][i] }}
+        </span>
+
+        <span>{{ opcion }}</span>
+      </button>
+    </div>
+
+    <div class="retroalimentacion" *ngIf="respondida">
+      <h3>{{ mensaje }}</h3>
+      <p>{{ preguntaActual.explicacion }}</p>
+    </div>
+
+    <button
+      *ngIf="respondida"
+      type="button"
+      class="boton-principal"
+      (click)="siguientePregunta()">
+
+      {{ indiceActual === preguntas.length - 1
+        ? 'Finalizar desafío'
+        : 'Siguiente pregunta' }}
+    </button>
+  </section>
+
+  <section class="tarjeta-resultado" *ngIf="finalizado">
+    <div class="icono-resultado">🏆</div>
+    <h2>¡Desafío completado!</h2>
+    <p>Has terminado todas las preguntas de esta actividad.</p>
+
+    <div class="total-final">
+      <span>Tu puntuación final</span>
+      <strong>{{ puntos }} puntos</strong>
+    </div>
+
+    <button
+      type="button"
+      class="boton-principal"
+      (click)="reiniciar()">
+      Volver a intentarlo
+    </button>
+  </section>
+</div>
+

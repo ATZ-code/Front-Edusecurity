@@ -1,22 +1,13 @@
 
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
-interface Modulo {
-  nombre: string;
-  descripcion: string;
-  icono: string;
-  duracion: string;
-  recompensa: number;
-  estado: string;
-  bloqueado: boolean;
-}
-
-interface Opcion {
-  id: string;
-  texto: string;
-  correcta: boolean;
+interface Pregunta {
+  enunciado: string;
+  opciones: string[];
+  respuestaCorrecta: number;
+  explicacion: string;
+  puntos: number;
 }
 
 @Component({
@@ -26,134 +17,108 @@ interface Opcion {
   templateUrl: './aprendizaje-gamificado.html',
   styleUrl: './aprendizaje-gamificado.scss'
 })
-export class AprendizajeGamificado {
-  xp = 120;
-  nivel = 2;
-  completados = 1;
-  insignias = 1;
+export class AprendizajeGamificadoComponent {
 
-  respuesta = '';
-  revisado = false;
-  esCorrecta = false;
-
-  modulos: Modulo[] = [
+  preguntas: Pregunta[] = [
     {
-      nombre: 'Fundamentos de ciberseguridad',
-      descripcion: 'Aprende los principios básicos de la seguridad digital.',
-      icono: '🛡️',
-      duracion: '10 min',
-      recompensa: 50,
-      estado: 'Completado',
-      bloqueado: false
+      enunciado: '¿Qué es el phishing?',
+      opciones: [
+        'Un programa para mejorar el computador',
+        'Un engaño para robar información personal',
+        'Una actualización del sistema',
+        'Un método para proteger contraseñas'
+      ],
+      respuestaCorrecta: 1,
+      explicacion: 'El phishing busca engañar a las personas para obtener contraseñas o datos personales.',
+      puntos: 10
     },
     {
-      nombre: 'Detecta el phishing',
-      descripcion: 'Identifica mensajes, correos y enlaces engañosos.',
-      icono: '🎣',
-      duracion: '15 min',
-      recompensa: 100,
-      estado: 'En progreso',
-      bloqueado: false
+      enunciado: '¿Qué debes hacer si recibes un enlace sospechoso?',
+      opciones: [
+        'Abrirlo inmediatamente',
+        'Compartirlo con tus amigos',
+        'Verificar su origen antes de abrirlo',
+        'Ingresar tus contraseñas'
+      ],
+      respuestaCorrecta: 2,
+      explicacion: 'Siempre verifica el remitente y la dirección del enlace antes de abrirlo.',
+      puntos: 10
     },
     {
-      nombre: 'Contraseñas seguras',
-      descripcion: 'Protege tus cuentas con contraseñas robustas.',
-      icono: '🔑',
-      duracion: '12 min',
-      recompensa: 75,
-      estado: 'Pendiente',
-      bloqueado: false
+      enunciado: '¿Cuál es una contraseña más segura?',
+      opciones: [
+        '123456',
+        'password',
+        'juan2005',
+        'T7!mQ9#vL2@p'
+      ],
+      respuestaCorrecta: 3,
+      explicacion: 'Una contraseña larga y difícil de adivinar, diferente para cada cuenta, mejora la seguridad.',
+      puntos: 10
     },
     {
-      nombre: 'Protección de datos personales',
-      descripcion: 'Aprende a cuidar tu información en Internet.',
-      icono: '🔒',
-      duracion: '20 min',
-      recompensa: 100,
-      estado: 'Bloqueado',
-      bloqueado: true
+      enunciado: '¿Qué debes hacer si sospechas que robaron tu contraseña?',
+      opciones: [
+        'No hacer nada',
+        'Cambiarla inmediatamente y proteger la cuenta',
+        'Publicarla para pedir ayuda',
+        'Usar la misma contraseña en todas las cuentas'
+      ],
+      respuestaCorrecta: 1,
+      explicacion: 'Cambia la contraseña desde el sitio oficial y activa la verificación en dos pasos cuando esté disponible.',
+      puntos: 10
     }
   ];
 
-  opciones: Opcion[] = [
-    {
-      id: 'A',
-      texto: 'Abrir el enlace y escribir mi contraseña.',
-      correcta: false
-    },
-    {
-      id: 'B',
-      texto: 'No abrir el enlace y verificar por canales oficiales.',
-      correcta: true
-    },
-    {
-      id: 'C',
-      texto: 'Reenviar el mensaje a mis contactos.',
-      correcta: false
-    }
-  ];
+  indiceActual = 0;
+  respuestaSeleccionada: number | null = null;
+  puntos = 0;
+  respondida = false;
+  finalizado = false;
+  mensaje = '';
 
-  constructor(private router: Router) {}
-
-  navegar(event: Event, ruta: string): void {
-    event.preventDefault();
-
-    if (this.router.config.some(r => r.path === ruta.replace(/^\//, ''))) {
-      this.router.navigateByUrl(ruta);
-    } else {
-      alert('La página "' + ruta + '" todavía está pendiente de crear.');
-    }
+  get preguntaActual(): Pregunta {
+    return this.preguntas[this.indiceActual];
   }
 
-  irAlDesafio(): void {
-    document.getElementById('desafio')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  }
-
-  seleccionar(id: string): void {
-    if (!this.revisado) {
-      this.respuesta = id;
-    }
-  }
-
-  comprobarRespuesta(): void {
-    if (!this.respuesta || this.revisado) {
+  responder(indice: number): void {
+    if (this.respondida || this.finalizado) {
       return;
     }
 
-    this.esCorrecta = this.opciones.some(
-      opcion => opcion.id === this.respuesta && opcion.correcta
-    );
+    this.respuestaSeleccionada = indice;
+    this.respondida = true;
 
-    this.revisado = true;
-
-    if (this.esCorrecta) {
-      this.xp += 50;
-      this.completados = Math.min(this.completados + 1, 4);
-      this.insignias = Math.max(this.insignias, 2);
-      this.nivel = Math.floor(this.xp / 100) + 1;
-
-      const siguiente = this.modulos.find(
-        modulo => modulo.bloqueado
-      );
-
-      if (siguiente) {
-        siguiente.bloqueado = false;
-        siguiente.estado = 'Pendiente';
-      }
+    if (indice === this.preguntaActual.respuestaCorrecta) {
+      this.puntos += this.preguntaActual.puntos;
+      this.mensaje = '¡Correcto! Has ganado ' +
+        this.preguntaActual.puntos + ' puntos.';
+    } else {
+      this.mensaje = 'Respuesta incorrecta. ¡Sigue aprendiendo!';
     }
   }
 
-  reiniciarDesafio(): void {
-    this.respuesta = '';
-    this.revisado = false;
-    this.esCorrecta = false;
+  siguientePregunta(): void {
+    if (!this.respondida) {
+      return;
+    }
+
+    if (this.indiceActual < this.preguntas.length - 1) {
+      this.indiceActual++;
+      this.respuestaSeleccionada = null;
+      this.respondida = false;
+      this.mensaje = '';
+    } else {
+      this.finalizado = true;
+    }
   }
 
-  iniciarModulo(nombre: string): void {
-    alert('Has seleccionado: ' + nombre +
-      '. Aquí conectaremos el contenido del módulo.');
+  reiniciar(): void {
+    this.indiceActual = 0;
+    this.respuestaSeleccionada = null;
+    this.puntos = 0;
+    this.respondida = false;
+    this.finalizado = false;
+    this.mensaje = '';
   }
 }

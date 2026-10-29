@@ -1,218 +1,52 @@
 
-<div class="app-layout">
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-icon">🛡️</div>
-      <div>
-        <h2>EDUSECURITY</h2>
-        <span>Aprende a protegerte</span>
-      </div>
+<div class="contenedor-aprendizaje">
+  <header class="encabezado">
+    <h1>Aprendizaje Gamificado</h1>
+    <p>Aprende ciberseguridad mientras pones a prueba tus conocimientos.</p>
+  </header>
+
+  <section class="panel-puntos">
+    <span>Tu puntuación</span>
+    <strong>{{ puntos }} puntos</strong>
+  </section>
+
+  <section class="tarjeta-pregunta" *ngIf="!finalizado">
+    <div class="progreso">
+      Pregunta {{ indiceActual + 1 }} de {{ preguntas.length }}
     </div>
 
-    <div class="profile">
-      <div class="avatar">A</div>
-      <div>
-        <strong>Estudiante</strong>
-        <p>Explorador digital</p>
-      </div>
+    <h2>{{ preguntaActual.enunciado }}</h2>
+
+    <div class="opciones">
+      <button
+        *ngFor="let opcion of preguntaActual.opciones; let i = index"
+        type="button"
+        class="opcion"
+        [class.correcta]="respondida && i === preguntaActual.respuestaCorrecta"
+        [class.incorrecta]="respondida && i === respuestaSeleccionada && i !== preguntaActual.respuestaCorrecta"
+        [disabled]="respondida"
+        (click)="responder(i)">
+        {{ opcion }}
+      </button>
     </div>
 
-    <p class="menu-label">MENÚ PRINCIPAL</p>
-    <nav class="navigation">
-      <a href="#" class="nav-item" (click)="navegar($event, '/dashboard')">⌂ <span>Dashboard</span></a>
-      <a href="#" class="nav-item" (click)="navegar($event, '/modulos-educativos')">▤ <span>Módulos educativos</span></a>
-      <a href="#" class="nav-item" (click)="navegar($event, '/simulaciones')">◎ <span>Simulaciones</span></a>
-      <a href="#" class="nav-item active">✦ <span>Aprendizaje gamificado</span></a>
-      <a href="#" class="nav-item" (click)="navegar($event, '/reportes-progreso')">▥ <span>Mi progreso</span></a>
-      <a href="#" class="nav-item" (click)="navegar($event, '/biblioteca-digital')">▣ <span>Biblioteca digital</span></a>
-      <a href="#" class="nav-item" (click)="navegar($event, '/soporte-asistencia')">☏ <span>Soporte y asistencia</span></a>
-    </nav>
+    <div class="retroalimentacion" *ngIf="respondida">
+      <h3>{{ mensaje }}</h3>
+      <p>{{ preguntaActual.explicacion }}</p>
 
-    <div class="sidebar-bottom">
-      <div class="shield-small">🔐</div>
-      <strong>¡Mantente alerta!</strong>
-      <p>Tu seguridad digital comienza con tus decisiones.</p>
+      <button type="button" class="boton-principal" (click)="siguientePregunta()">
+        {{ indiceActual === preguntas.length - 1 ? 'Ver resultado' : 'Siguiente pregunta' }}
+      </button>
     </div>
-  </aside>
+  </section>
 
-  <main class="main-content">
-    <header class="topbar">
-      <div>
-        <span class="eyebrow">TU ESPACIO DE APRENDIZAJE</span>
-        <h1>¡Hola, estudiante! 👋</h1>
-        <p>Aprende, practica y conviértete en un experto en seguridad digital.</p>
-      </div>
-      <div class="level-badge">⭐ Nivel {{ nivel }}</div>
-    </header>
+  <section class="tarjeta-resultado" *ngIf="finalizado">
+    <h2>¡Desafío completado!</h2>
+    <p>Has terminado las preguntas de ciberseguridad.</p>
+    <p class="resultado-puntos">Puntuación final: {{ puntos }} puntos</p>
 
-    <section class="welcome-banner">
-      <div class="banner-text">
-        <span class="banner-tag">🚀 SIGUE AVANZANDO</span>
-        <h2>¡Tu aventura digital continúa!</h2>
-        <p>Completa desafíos y aprende a reconocer las amenazas que existen en Internet.</p>
-        <button class="primary-button" (click)="irAlDesafio()">
-          Comenzar desafío →
-        </button>
-      </div>
-      <div class="banner-art">🛡️</div>
-    </section>
-
-    <section class="stats-grid">
-      <article class="stat-card">
-        <div class="stat-icon purple">✦</div>
-        <span>Experiencia acumulada</span>
-        <h2>{{ xp }} XP</h2>
-        <small>Continúa aprendiendo</small>
-      </article>
-      <article class="stat-card">
-        <div class="stat-icon green">✓</div>
-        <span>Desafíos completados</span>
-        <h2>{{ completados }}</h2>
-        <small>Retos superados</small>
-      </article>
-      <article class="stat-card">
-        <div class="stat-icon orange">🔥</div>
-        <span>Racha de aprendizaje</span>
-        <h2>3 días</h2>
-        <small>¡No pierdas el ritmo!</small>
-      </article>
-      <article class="stat-card">
-        <div class="stat-icon blue">🏆</div>
-        <span>Insignias obtenidas</span>
-        <h2>{{ insignias }}</h2>
-        <small>Reconocimientos ganados</small>
-      </article>
-    </section>
-
-    <section class="learning-section">
-      <div class="section-heading">
-        <div>
-          <h2>Tu camino de aprendizaje</h2>
-          <p>Avanza a tu ritmo y desbloquea nuevos conocimientos.</p>
-        </div>
-        <span class="progress-label">{{ completados }}/4 completados</span>
-      </div>
-
-      <div class="progress-track">
-        <div class="progress-fill" [style.width.%]="completados * 25"></div>
-      </div>
-
-      <div class="module-list">
-        <article class="module-card" *ngFor="let modulo of modulos">
-          <div class="module-icon" [class.locked]="modulo.bloqueado">
-            {{ modulo.icono }}
-          </div>
-          <div class="module-info">
-            <div class="module-title">
-              <h3>{{ modulo.nombre }}</h3>
-              <span class="status" [class.done]="modulo.estado === 'Completado'"
-                [class.locked-status]="modulo.bloqueado">
-                {{ modulo.bloqueado ? 'Bloqueado' : modulo.estado }}
-              </span>
-            </div>
-            <p>{{ modulo.descripcion }}</p>
-            <div class="module-footer">
-              <span>⏱ {{ modulo.duracion }}</span>
-              <span>⭐ {{ modulo.recompensa }} XP</span>
-            </div>
-          </div>
-          <button class="module-button"
-            [disabled]="modulo.bloqueado || modulo.estado === 'Completado'"
-            (click)="iniciarModulo(modulo.nombre)">
-            {{ modulo.bloqueado ? '🔒' : modulo.estado === 'Completado' ? '✓' : 'Comenzar →' }}
-          </button>
-        </article>
-      </div>
-    </section>
-
-    <section class="challenge-section" id="desafio">
-      <div class="challenge-card">
-        <span class="section-tag">🎯 DESAFÍO INTERACTIVO</span>
-        <h2>¿Puedes detectar el phishing?</h2>
-        <p class="challenge-description">
-          Recibes un mensaje que dice que tu cuenta bancaria será bloqueada
-          si no verificas tus datos inmediatamente.
-        </p>
-
-        <div class="fake-message">
-          <div class="message-header">📩 Mensaje recibido</div>
-          <p><strong>De:</strong> seguridad-banco@example.com</p>
-          <p>Tu cuenta será suspendida. Haz clic en el enlace y confirma tu contraseña urgentemente.</p>
-        </div>
-
-        <h3>¿Qué deberías hacer?</h3>
-        <div class="answer-list">
-          <button *ngFor="let opcion of opciones"
-            class="answer-button"
-            [class.selected]="respuesta === opcion.id"
-            [class.correct]="revisado && opcion.correcta"
-            [class.incorrect]="revisado && respuesta === opcion.id && !opcion.correcta"
-            [disabled]="revisado"
-            (click)="seleccionar(opcion.id)">
-            <span>{{ opcion.id }}.</span> {{ opcion.texto }}
-          </button>
-        </div>
-
-        <div class="feedback" *ngIf="revisado" [class.feedback-good]="esCorrecta">
-          <strong>{{ esCorrecta ? '¡Excelente! +50 XP 🎉' : 'No te preocupes, aprende de este caso.' }}</strong>
-          <p>{{ esCorrecta
-            ? 'Identificaste una señal de phishing. Nunca compartas tus contraseñas desde enlaces recibidos por mensajes.'
-            : 'No pulses el enlace. Verifica el remitente y contacta al banco por sus canales oficiales.' }}</p>
-        </div>
-
-        <button class="primary-button answer-submit"
-          *ngIf="!revisado"
-          [disabled]="!respuesta"
-          (click)="comprobarRespuesta()">
-          Comprobar respuesta
-        </button>
-
-        <button class="secondary-button answer-submit"
-          *ngIf="revisado"
-          (click)="reiniciarDesafio()">
-          Intentar de nuevo
-        </button>
-      </div>
-
-      <div class="evaluation-card">
-        <span class="section-tag">📝 EVALUACIÓN RÁPIDA</span>
-        <h2>Pon a prueba tus conocimientos</h2>
-        <p>Pequeñas pruebas para reforzar lo que has aprendido.</p>
-
-        <div class="quiz-item">
-          <span class="quiz-number">01</span>
-          <div>
-            <strong>Contraseñas seguras</strong>
-            <p>¿Cómo proteger tus cuentas?</p>
-          </div>
-        </div>
-        <div class="quiz-item">
-          <span class="quiz-number">02</span>
-          <div>
-            <strong>Navegación segura</strong>
-            <p>Aprende a reconocer enlaces sospechosos.</p>
-          </div>
-        </div>
-        <div class="quiz-item">
-          <span class="quiz-number">03</span>
-          <div>
-            <strong>Protección de datos</strong>
-            <p>Cuida tu información personal.</p>
-          </div>
-        </div>
-
-        <div class="achievement">
-          <span>🏆</span>
-          <div>
-            <strong>¡Cada reto cuenta!</strong>
-            <p>Gana experiencia y desbloquea insignias.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <footer class="footer">
-      EDUSECURITY © 2026 · Aprende hoy, protégete siempre. 🔐
-    </footer>
-  </main>
+    <button type="button" class="boton-principal" (click)="reiniciar()">
+      Volver a jugar
+    </button>
+  </section>
 </div>
