@@ -1,4 +1,5 @@
 
+
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
@@ -12,13 +13,13 @@ export const routes: Routes = [
     path: 'aprendizaje-gamificado',
     loadComponent: () =>
       import('./pages/aprendizaje-gamificado/aprendizaje-gamificado')
-        .then(m => m.AprendizajeGamificado)
+        .then(m => m.AprendizajeGamificadoComponent)
   },
   {
     path: 'soporte-asistencia',
     loadComponent: () =>
       import('./pages/soporte-asistencia/soporte-asistencia')
-        .then(m => m.SoporteAsistencia)
+        .then(m => m.AsistenciaSoporteComponent)
   },
   {
     path: '**',

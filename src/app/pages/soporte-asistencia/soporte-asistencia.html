@@ -1,1 +1,131 @@
-<p>soporte-asistencia works!</p>
+
+<div class="pagina-soporte">
+  <header class="encabezado-soporte">
+    <span class="etiqueta">EDUSECURITY · CENTRO DE AYUDA</span>
+    <h1>Asistencia y Soporte</h1>
+    <p>
+      Registra tus inconvenientes, solicita ayuda y consulta el estado
+      de tus solicitudes.
+    </p>
+  </header>
+
+  <section class="tarjeta-soporte">
+    <h2>Crear una solicitud</h2>
+    <p class="texto-secundario">
+      Describe tu problema para que pueda ser revisado.
+    </p>
+
+    <form (ngSubmit)="registrarSolicitud()">
+      <div class="campo">
+        <label for="asunto">Asunto</label>
+        <input
+          id="asunto"
+          type="text"
+          name="asunto"
+          [(ngModel)]="asunto"
+          placeholder="Ej. No puedo ingresar a mi cuenta"
+          maxlength="100"
+          required>
+      </div>
+
+      <div class="campo">
+        <label for="categoria">Categoría</label>
+        <select
+          id="categoria"
+          name="categoria"
+          [(ngModel)]="categoria"
+          required>
+          <option value="Problema técnico">Problema técnico</option>
+          <option value="Acceso a la plataforma">Acceso a la plataforma</option>
+          <option value="Preguntas y desafíos">Preguntas y desafíos</option>
+          <option value="Seguridad informática">Seguridad informática</option>
+          <option value="Otra consulta">Otra consulta</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="descripcion">Descripción del problema</label>
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          [(ngModel)]="descripcion"
+          placeholder="Explica qué ocurrió y qué necesitas..."
+          rows="5"
+          maxlength="1000"
+          required>
+        </textarea>
+        <span class="contador">
+          {{ descripcion.length }} / 1000 caracteres
+        </span>
+      </div>
+
+      <button type="submit" class="boton-principal">
+        Enviar solicitud
+      </button>
+    </form>
+
+    <div
+      *ngIf="mensaje"
+      class="mensaje"
+      [class.mensaje-exito]="tipoMensaje === 'exito'"
+      [class.mensaje-error]="tipoMensaje === 'error'"
+      role="status">
+      {{ mensaje }}
+    </div>
+  </section>
+
+  <section class="seccion-solicitudes">
+    <div class="titulo-solicitudes">
+      <div>
+        <h2>Mis solicitudes</h2>
+        <p class="texto-secundario">
+          Consulta los registros guardados en este navegador.
+        </p>
+      </div>
+
+      <span class="contador-solicitudes">
+        {{ solicitudes.length }} solicitudes
+      </span>
+    </div>
+
+    <div class="estado-vacio" *ngIf="solicitudes.length === 0">
+      <h3>Aún no tienes solicitudes</h3>
+      <p>Cuando registres una, aparecerá en esta sección.</p>
+    </div>
+
+    <article
+      class="tarjeta-solicitud"
+      *ngFor="let solicitud of solicitudes">
+
+      <div class="solicitud-superior">
+        <div>
+          <span class="numero-solicitud">
+            Solicitud #{{ solicitud.id }}
+          </span>
+          <h3>{{ solicitud.asunto }}</h3>
+        </div>
+
+        <span class="estado-pendiente">
+          {{ solicitud.estado }}
+        </span>
+      </div>
+
+      <p class="categoria-solicitud">
+        {{ solicitud.categoria }} · {{ solicitud.fecha }}
+      </p>
+
+      <p class="descripcion-solicitud">
+        {{ solicitud.descripcion }}
+      </p>
+    </article>
+  </section>
+
+  <section class="aviso-soporte">
+    <h2>Consejo de seguridad</h2>
+    <p>
+      Nunca compartas contraseñas, códigos de verificación ni información
+      bancaria al solicitar soporte.
+    </p>
+  </section>
+</div>
+
